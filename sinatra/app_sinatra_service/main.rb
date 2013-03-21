@@ -183,6 +183,22 @@ get '/service/rabbitmq/:key' do
   read_from_rabbit(params[:key], client)
 end
 
+post '/service/rabbitmqitems' do
+  client = rabbit_srs_service
+  client.queue(params["queue"])
+  client.queue(params["durable_queue"], :durable => true)
+  client.direct(params["exchange"])
+  client.direct(params["durable_exchange"], :durable => true)
+end
+
+delete '/service/rabbitmqitems' do
+  client = rabbit_srs_service
+  client.queue(params["queue"]).delete
+  client.queue(params["durable_queue"], :durable => true).delete
+  client.direct(params["exchange"]).delete
+  client.direct(params["durable_exchange"], :durable => true).delete
+end
+
 get '/service/vblob/list' do
   load_vblob
   AWS::S3::Service.buckets(:reload).inspect rescue "list failed: #{$!} at #{$@}"
